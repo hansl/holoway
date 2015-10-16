@@ -1,0 +1,41 @@
+{
+  "name": "holoway",
+  "version": "1.0.0",
+  "description": "A Django-inspired server framework for JavaScript ES6.",
+  "main": "lib/holoway.js",
+  "scripts": {
+    "compile": "babel -d lib/ src/",
+    "test": "mocha --compilers js:babel/register --plugin chai test/**/*.js",
+    "test_debug": "node-debug mocha --compilers js:babel/register --plugin chai test/**/*.js",
+    "prepublish": "npm test && npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hansl/holoway.git"
+  },
+  "keywords": [
+    "Server",
+    "JS",
+    "ES6",
+    "JavaScript",
+    "WebServer"
+  ],
+  "author": "Hans Larsen",
+  "license": "LICENSE",
+  "bugs": {
+    "url": "https://github.com/hansl/holoway/issues"
+  },
+  "homepage": "https://github.com/hansl/holoway#readme",
+  "dependencies": {
+    "core-js": "^1.2.1",
+    "express": "^4.13.3",
+    "lodash": "^3.10.1",
+    "rx": "^4.0.0"
+  },
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3",
+    "nodemon": "^1.7.1"
+  }
+}
