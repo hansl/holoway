@@ -85,6 +85,10 @@ export class Field {
     this._value = this.descriptor.convert(v);
   }
 
+  /* By default, the behaviour here is to convert values. */
+  asJson() { return this.value; }
+  fromJson(x) { this.value = x; }
+
   clear() {
     if (this.descriptor.required) {
       this.value = this.descriptor.default;

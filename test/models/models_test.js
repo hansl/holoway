@@ -1,6 +1,7 @@
 import {Model} from '../../src/db/models/models';
 import {Field} from '../../src/db/models/fields';
 import {FieldDescriptor} from '../../src/db/models/fields';
+import {MemoryDataStore} from '../../src/db/datastore/memory';
 import {NumberField} from '../../src/db/models/fields';
 import {NumberFieldDescriptor} from '../../src/db/models/fields';
 import {expect} from 'chai';
@@ -38,5 +39,19 @@ describe('Model', () => {
     expect(instance.myField).to.equal(2);
     expect(instance.$fieldArray.map((f) => f.value))
         .to.deep.equal([2]);
+  });
+
+  it('can query all', () => {
+    const store = new MemoryDataStore();
+    class TestModel extends Model({
+      myField: NumberField,
+      _store: store,
+    }) {}
+
+    expect(TestModel.all().length).to.be.equal(0);
+
+    const m1 = new TestModel();
+    TestModel.save(m1);
+    expect(TestModel.all().length).to.be.equal(1);
   });
 });

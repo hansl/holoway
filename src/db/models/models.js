@@ -3,7 +3,7 @@ import {FieldDescriptor} from '../../db/models/fields';
 import {assert} from '../../lib/assert';
 
 
-function _createSuperKlass({_options, ...fields}) {
+function _createSuperKlass({_options, _store, ...fields}) {
   const descriptorMap = Object.create(null);
   for (let name of Object.keys(fields)) {
     const definition = fields[name];
@@ -38,9 +38,18 @@ function _createSuperKlass({_options, ...fields}) {
     constructor({...values}) {
       super(descriptorMap, values);
     }
+
+    static all() {
+      assert(_store != null);
+      return _store.all({model: this});
+    }
+    static save(instance) {
+      assert(instance instanceof SuperKlass);
+      return _store.save(instance);
+    }
   }
 
-  for (let name of Object.keys(fields)) {
+  for (const name of Object.keys(fields)) {
     Object.defineProperty(SuperKlass.prototype, name, {
       get() { return this._fields[name].value; },
       set(v) { this._fields[name].value = v; },
@@ -58,7 +67,7 @@ class ModelBase extends Model {
     super(kToken);
     this._fields = Object.create(null);
 
-    for (let name of Object.keys(definitionMap)) {
+    for (const name of Object.keys(definitionMap)) {
       const value = values[name];
       const descriptor = definitionMap[name];
 
@@ -68,9 +77,23 @@ class ModelBase extends Model {
         model: this,
       });
     }
+
+    Object.freeze(this._fields);
   }
   get $fields() { return this._fields; }
   get $fieldArray() { return Object.values(this._fields); }
+
+  $asJson() {
+    const json = Object.create(null);
+    for (const name of Object.keys(this._fields)) {
+      json[name] = this._fields[name].asJson();
+    }
+    return json;
+  }
+
+  $save() {
+    return this.constructor.save(this);
+  }
 }
 
 
