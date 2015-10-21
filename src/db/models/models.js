@@ -39,13 +39,9 @@ function _createSuperKlass({_options, _store, ...fields}) {
       super(descriptorMap, values);
     }
 
-    static all() {
-      assert(_store != null);
-      return _store.all({model: this});
-    }
-    static save(instance) {
-      assert(instance instanceof SuperKlass);
-      return _store.save(instance);
+    static get store() {
+      assert(_store !== null);
+      return _store;
     }
   }
 
@@ -91,8 +87,50 @@ class ModelBase extends Model {
     return json;
   }
 
+  $clear() {
+    for (const name of Object.keys(this._fields)) {
+      this._fields[name].clear();
+    }
+  }
+
+  $copy(other) {
+    assert(other instanceof this.constructor);
+    for (const name of Object.keys(this._fields)) {
+      this[name] = other[name];
+    }
+  }
+
+  $loadFromJson(json) {
+    this.$clear();
+    for (const name of Object.keys(json)) {
+      this[name] = json[name];
+    }
+    return json;
+  }
+
+  $reset() {
+    return this.constructor.reset(this);
+  }
+
   $save() {
     return this.constructor.save(this);
+  }
+
+  static createFromJson(json) {
+    const instance = new this();
+    instance.$loadFromJson(json);
+    return instance;
+  }
+  static all() {
+    return this.store.all(this);
+  }
+  static save(instance) {
+    assert(instance instanceof this);
+    return this.store.save({instance});
+  }
+  static reset(instance) {
+    assert(instance instanceof this);
+    return this.store.load({instance});
   }
 }
 

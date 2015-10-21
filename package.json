@@ -5,7 +5,7 @@
   "main": "lib/holoway.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
-    "test": "mocha --compilers js:babel/register --plugin chai test/**/*.js",
+    "test": "mocha --compilers js:babel/register --plugin chai --recursive --colors test",
     "test_debug": "node-debug mocha --compilers js:babel/register --plugin chai test/**/*.js",
     "prepublish": "npm test && npm run compile"
   },

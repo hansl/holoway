@@ -41,6 +41,25 @@ describe('Model', () => {
         .to.deep.equal([2]);
   });
 
+  it('can save', () => {
+    const store = new MemoryDataStore();
+    class TestModel extends Model({
+      myField: NumberField,
+      _store: store,
+    }) {}
+
+    const m1 = new TestModel();
+
+    return TestModel.store.count()
+        .then((x) => expect(x).to.equal(0))
+        .then(() => {
+          TestModel.save(m1);
+          return TestModel.store.count();
+        })
+        .then((x) => expect(x).to.equal(1))
+        .catch(() => { throw 1 });
+  });
+
   it('can query all', () => {
     const store = new MemoryDataStore();
     class TestModel extends Model({
@@ -48,10 +67,31 @@ describe('Model', () => {
       _store: store,
     }) {}
 
-    expect(TestModel.all().length).to.be.equal(0);
+    const m1 = new TestModel();
+    return TestModel.all().count().toPromise()
+        .then((x) => expect(x).to.equal(0))
+        .then(() => {
+          TestModel.save(m1);
+          return TestModel.all().toPromise();
+        })
+        .then((x) => expect(x.$asJson()).to.deep.equal(m1.$asJson()));
+  });
+
+  it('can reset', () => {
+    const store = new MemoryDataStore();
+    class TestModel extends Model({
+      myField: NumberField,
+      _store: store,
+    }) {}
 
     const m1 = new TestModel();
-    TestModel.save(m1);
-    expect(TestModel.all().length).to.be.equal(1);
+    m1.myField = 1;
+    m1.$save();
+    expect(m1.myField).to.be.equal(1);
+    m1.$reset();
+    expect(m1.myField).to.be.equal(1);
+    m1.myField = 2;
+    m1.$reset();
+    expect(m1.myField).to.be.equal(1);
   });
 });

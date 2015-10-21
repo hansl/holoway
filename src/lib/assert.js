@@ -1,13 +1,11 @@
-
-export class AssertionError extends Error {
-  toString() {
-    return 'Assertion Failure';
-  }
-}
+import {Exception} from '../lib/exceptions';
 
 
-export function assert(cond, ex = AssertionError, ...args) {
+export class AssertionError extends Exception {}
+
+
+export function assert(cond, Exception = AssertionError, ...args) {
   if (!cond) {
-    throw new ex(...args);
+    throw new Exception(...args);
   }
 }
