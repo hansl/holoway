@@ -1,9 +1,9 @@
-import {Model} from '../../src/db/models/models';
-import {Field} from '../../src/db/models/fields';
-import {FieldDescriptor} from '../../src/db/models/fields';
+import {Model} from '../../src/db/model/model';
+import {Field} from '../../src/db/model/field';
+import {FieldDescriptor} from '../../src/db/model/field';
 import {MemoryDataStore} from '../../src/db/datastore/memory';
-import {NumberField} from '../../src/db/models/fields';
-import {NumberFieldDescriptor} from '../../src/db/models/fields';
+import {NumberField} from '../../src/db/model/field';
+import {NumberFieldDescriptor} from '../../src/db/model/field';
 import {expect} from 'chai';
 
 
@@ -22,9 +22,9 @@ describe('Model', () => {
     expect(instance.$fields.myField).to.be.an.instanceof(NumberField);
     expect(instance.$fields.myField).to.be.an.instanceof(Field);
 
-    expect(instance.$fieldArray.map((f) => f.name))
+    expect(instance.$fieldArray.map(f => f.name))
         .to.deep.equal(['myField']);
-    expect(instance.$fieldArray.map((f) => f.value))
+    expect(instance.$fieldArray.map(f => f.value))
         .to.deep.equal([undefined]);
   });
 
@@ -37,7 +37,7 @@ describe('Model', () => {
     });
 
     expect(instance.myField).to.equal(2);
-    expect(instance.$fieldArray.map((f) => f.value))
+    expect(instance.$fieldArray.map(f => f.value))
         .to.deep.equal([2]);
   });
 
@@ -45,30 +45,29 @@ describe('Model', () => {
     const store = new MemoryDataStore();
     class TestModel extends Model({
       myField: NumberField,
-      _store: store,
+      $store: store,
     }) {}
 
     const m1 = new TestModel();
 
-    return TestModel.store.count()
+    return store.count(TestModel).toPromise()
         .then((x) => expect(x).to.equal(0))
         .then(() => {
           TestModel.save(m1);
-          return TestModel.store.count();
+          return store.count(TestModel).toPromise();
         })
-        .then((x) => expect(x).to.equal(1))
-        .catch(() => { throw 1 });
+        .then((x) => expect(x).to.equal(1));
   });
 
   it('can query all', () => {
     const store = new MemoryDataStore();
     class TestModel extends Model({
       myField: NumberField,
-      _store: store,
+      $store: store,
     }) {}
 
     const m1 = new TestModel();
-    return TestModel.all().count().toPromise()
+    return TestModel.all().count(TestModel).toPromise()
         .then((x) => expect(x).to.equal(0))
         .then(() => {
           TestModel.save(m1);
@@ -81,7 +80,7 @@ describe('Model', () => {
     const store = new MemoryDataStore();
     class TestModel extends Model({
       myField: NumberField,
-      _store: store,
+      $store: store,
     }) {}
 
     const m1 = new TestModel();

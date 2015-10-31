@@ -1,4 +1,4 @@
-import {NotImplementedError} from '../../lib/exceptions';
+import {NotImplementedError} from '../../lib/exception';
 
 export class DataStore {
   all() {

@@ -1,7 +1,7 @@
-import {Field} from '../../src/db/models/fields';
-import {FieldDescriptor} from '../../src/db/models/fields';
-import {NumberField} from '../../src/db/models/fields';
-import {NumberFieldDescriptor} from '../../src/db/models/fields';
+import {Field} from '../../src/db/model/field';
+import {FieldDescriptor} from '../../src/db/model/field';
+import {NumberField} from '../../src/db/model/field';
+import {NumberFieldDescriptor} from '../../src/db/model/field';
 import {expect} from 'chai';
 
 

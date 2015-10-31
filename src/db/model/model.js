@@ -1,11 +1,21 @@
-import {Field} from '../../db/models/fields';
-import {FieldDescriptor} from '../../db/models/fields';
+import {Field} from '../../db/model/field';
+import {FieldDescriptor} from '../../db/model/field';
+import {ModelManager} from '../../db/model/manager';
 import {assert} from '../../lib/assert';
+import {ArgumentError} from '../../lib/exception';
+import {snakeCase} from '../../lib/string';
+
+// If a name starts with this string, it's not a field.
+const kInternalNameToken = '$';
 
 
-function _createSuperKlass({_options, _store, ...fields}) {
+function _createSuperKlass({$name, $tableName, $manager, $store, ...fields}) {
   const descriptorMap = Object.create(null);
+
   for (let name of Object.keys(fields)) {
+    if (name[0] == kInternalNameToken) {
+      continue;
+    }
     const definition = fields[name];
 
     if (definition instanceof FieldDescriptor) {
@@ -28,20 +38,30 @@ function _createSuperKlass({_options, _store, ...fields}) {
       descriptorMap[name] = new descriptor({name, ...definition});
     }
     else {
-      throw ArgumentError('Definition ' + JSON.stringify(definition)
-                          + ' invalid.');
+      throw new ArgumentError(`fields["${name}"]`, definition);
     }
   }
   Object.freeze(descriptorMap);
+
+  const name = ($tableName || $name);
 
   class SuperKlass extends ModelBase {
     constructor({...values}) {
       super(descriptorMap, values);
     }
 
+    static get tableName() {
+      return '' + (name || snakeCase(this.name));
+    }
+    static get manager() {
+      if (!$manager) {
+        $manager = new ModelManager({store: this.store, model: this});
+      }
+      return $manager;
+    }
     static get store() {
-      assert(_store !== null);
-      return _store;
+      assert($store !== null);
+      return $store;
     }
   }
 
@@ -78,6 +98,7 @@ class ModelBase extends Model {
   }
   get $fields() { return this._fields; }
   get $fieldArray() { return Object.values(this._fields); }
+  get $manager() { return this.constructor.manager; }
 
   $asJson() {
     const json = Object.create(null);
@@ -98,6 +119,7 @@ class ModelBase extends Model {
     for (const name of Object.keys(this._fields)) {
       this[name] = other[name];
     }
+    return Promise.resolve();
   }
 
   $loadFromJson(json) {
@@ -105,7 +127,6 @@ class ModelBase extends Model {
     for (const name of Object.keys(json)) {
       this[name] = json[name];
     }
-    return json;
   }
 
   $reset() {
@@ -116,6 +137,9 @@ class ModelBase extends Model {
     return this.constructor.save(this);
   }
 
+  static create() {
+    this.store.create(this);
+  }
   static createFromJson(json) {
     const instance = new this();
     instance.$loadFromJson(json);

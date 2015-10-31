@@ -1,5 +1,6 @@
+import {MemoryQuery} from '../../db/query/memory';
 import {DataStore} from '../datastore/datastore';
-import {Model} from '../models/models';
+import {Model} from '../model/model';
 import {assert} from '../../lib/assert';
 import Rx from 'rx';
 
@@ -10,6 +11,10 @@ export class MemoryDataStore extends DataStore {
     this._map = new Map();
   }
 
+  /**
+   * Returns an Observable which lists all of ModelKlass in the
+   * database.
+   */
   all(ModelKlass) {
     if (!this._map.has(ModelKlass)) {
       return Rx.Observable.empty();
@@ -20,14 +25,35 @@ export class MemoryDataStore extends DataStore {
         return ModelKlass.createFromJson(value)
       });
   }
-  count() {
-    return new Promise((resolve, reject) => {
-      resolve(Array.from(this._map.values()).length);
-    });
+
+  /**
+   * Returns a single value Observable which is the count of objects.
+   */
+  count(ModelKlass) {
+    if (!this._map.has(ModelKlass)) {
+      return Rx.Observable.just(0);
+    }
+
+    const m = this._map.get(ModelKlass);
+    return Rx.Observable.just(Array.from(m.values()).length);
   }
+
+  /**
+   * Create and save a new instance of the model class.
+   */
   create(ModelKlass) {
-    return new ModelKlass();
+    const instance = new ModelKlass();
+    this.save({instance});
+    return Rx.Observable.just(instance);
   }
+
+  /**
+   * Create a query object.
+   */
+  createQuery(options) {
+    return new MemoryQuery(options);
+  }
+
   load({instance}) {
     const klass = instance.constructor;
     if (!this._map.has(klass)) {

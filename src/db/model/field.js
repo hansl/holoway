@@ -1,7 +1,9 @@
 import {assert} from '../../lib/assert';
+import {Exception} from '../../lib/exception';
 
 
-export class RequiredOptionalMismatchError {}
+export class RequiredOptionalMismatchError extends Exception {}
+export class UndefinedFieldAccessError extends Exception {}
 
 
 export class FieldDescriptor {
@@ -60,15 +62,17 @@ export class NumberFieldDescriptor extends FieldDescriptor {
 export class Field {
   _descriptor: FieldDescriptor
   _dirty: bool
+  _undefined: bool
   _value: any
 
   constructor(options = {}) {
-    let {value, descriptor, model} = options;
+    let {value, descriptor, model, _undefined} = options;
     assert(this.constructor.descriptor);
 
     this._descriptor = descriptor || new this.constructor.descriptor(options);
     this._dirty = false;
     this._model = model;
+    this._undefined = _undefined;
 
     this._value = this.descriptor.convert(value);
   }
@@ -79,8 +83,12 @@ export class Field {
   get name() { return this.descriptor.name; }
 
   get hasValue() { return this._value !== undefined; }
-  get value() { return this.hasValue ? this._value : this.descriptor.default; }
+  get value() {
+    assert(!this._undefined, UndefinedFieldAccessError);
+    return this.hasValue ? this._value : this.descriptor.default;
+  }
   set value(v) {
+    this._undefined = false;
     this._dirty = true;
     this._value = this.descriptor.convert(v);
   }
@@ -88,6 +96,8 @@ export class Field {
   /* By default, the behaviour here is to convert values. */
   asJson() { return this.value; }
   fromJson(x) { this.value = x; }
+
+  convert(v) { return this.descriptor.convert(v); }
 
   clear() {
     if (this.descriptor.required) {

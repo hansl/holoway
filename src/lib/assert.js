@@ -1,4 +1,4 @@
-import {Exception} from '../lib/exceptions';
+import {Exception} from '../lib/exception';
 
 
 export class AssertionError extends Exception {}
