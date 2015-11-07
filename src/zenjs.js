@@ -4,7 +4,7 @@ import {once} from './lib/annotations';
 import express from 'express';
 
 
-class Holoway {
+class ZenJs {
   _settings: Object<string, any>
 
   constructor() {
@@ -45,4 +45,5 @@ class Holoway {
 }
 
 
-export default new Holoway();
+export const manager = new ZenJs();
+export const models = {};

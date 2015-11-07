@@ -1,8 +1,8 @@
 {
-  "name": "holoway",
+  "name": "zenjs",
   "version": "1.0.0",
   "description": "A Django-inspired server framework for JavaScript ES6.",
-  "main": "lib/holoway.js",
+  "main": "lib/zenjs.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
     "test": "mocha --compilers js:babel/register --plugin chai --recursive --colors test",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hansl/holoway.git"
+    "url": "git+https://github.com/hansl/zenjs.git"
   },
   "keywords": [
     "Server",
@@ -23,9 +23,9 @@
   "author": "Hans Larsen",
   "license": "LICENSE",
   "bugs": {
-    "url": "https://github.com/hansl/holoway/issues"
+    "url": "https://github.com/hansl/zenjs/issues"
   },
-  "homepage": "https://github.com/hansl/holoway#readme",
+  "homepage": "https://github.com/hansl/zenjs#readme",
   "dependencies": {
     "core-js": "^1.2.1",
     "express": "^4.13.3",
