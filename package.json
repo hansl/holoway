@@ -1,6 +1,6 @@
 {
   "name": "zenjs",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "A Django-inspired server framework for JavaScript ES6.",
   "main": "lib/zenjs.js",
   "scripts": {
